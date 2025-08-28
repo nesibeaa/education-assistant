@@ -1,0 +1,36 @@
+<div class="auth-page">
+  <div class="auth-card">
+    <h1>Kayıt Ol</h1>
+
+    <div class="auth-field">
+      <label for="reg-email">E‑posta</label>
+      <input
+        id="reg-email"
+        type="email"
+        name="email"
+        [(ngModel)]="email"
+        placeholder="you@example.com"
+        required
+      />
+    </div>
+
+    <div class="auth-field">
+      <label for="reg-password">Şifre</label>
+      <input
+        id="reg-password"
+        type="password"
+        name="password"
+        [(ngModel)]="password"
+        placeholder="••••••••"
+        required
+      />
+    </div>
+
+    <div class="auth-actions">
+      <button class="primary" (click)="onSubmit()">Kayıt ol</button>
+      
+    </div>
+
+    <div class="auth-note" *ngIf="note">{{ note }}</div>
+  </div>
+</div>

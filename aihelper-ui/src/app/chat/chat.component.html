@@ -1,0 +1,89 @@
+<section class="chat">
+  <h2>Öğrenme Koçu</h2>
+
+  <div class="history">
+    <div *ngFor="let r of history" class="row" [ngClass]="r.role">
+      <!-- Kullanıcı -->
+      <ng-container *ngIf="r.role === 'user'">
+        <div class="bubble user">
+          <div class="meta">Sen</div>
+          <div class="text">{{ r.text }}</div>
+        </div>
+      </ng-container>
+
+      <!-- Asistan -->
+      <ng-container *ngIf="r.role === 'assistant'">
+        <div class="bubble bot">
+          <div class="meta">
+            Koç <span class="src">({{ r.data.source }})</span>
+          </div>
+
+          <div class="kv" *ngIf="has(r.data.topic)">
+            <span class="k">Topic:</span>
+            <span class="v">{{ r.data.topic }}</span>
+          </div>
+
+          <div class="kv" *ngIf="has(r.data.reply)">
+            <span class="k">Response:</span>
+            <span class="v">{{ r.data.reply }}</span>
+          </div>
+
+          <div class="kv" *ngIf="has(r.data.status)">
+            <span class="k">Status:</span>
+            <span class="v">{{ r.data.status }}</span>
+          </div>
+
+          <div class="kv" *ngIf="has(r.data.difficulty)">
+            <span class="k">Difficulty:</span>
+            <span class="v">{{ r.data.difficulty }}</span>
+          </div>
+
+          <div class="kv" *ngIf="has(r.data.nextStep)">
+            <span class="k">Next Step:</span>
+            <span class="v">{{ r.data.nextStep }}</span>
+          </div>
+
+       
+
+          <!-- Kaynaklar -->
+          <div class="resources" *ngIf="r.data.resources?.length">
+            <div class="label">Resources:</div>
+            <ul>
+              <li *ngFor="let link of r.data.resources">
+                <a [href]="link.url" target="_blank" rel="noopener">
+                  {{ link.title }}
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </ng-container>
+
+      <!-- Hata balonu -->
+      <ng-container *ngIf="r.role === 'error'">
+        <div class="bubble error">
+          <div class="meta">Koç (error)</div>
+          <div class="kv">
+            <span class="k">Response:</span>
+            <span class="v">Üzgünüm, bir hata oluştu.</span>
+          </div>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+
+  <div class="composer">
+    <textarea
+      rows="3"
+      placeholder="Sorunu yaz ve Enter'a bas (Shift+Enter: satır)"
+      [(ngModel)]="input"
+      (keydown)="keydown($event)"
+    ></textarea>
+
+    <div class="actions">
+      <button (click)="send()" [disabled]="loading || !input.trim()">
+        {{ loading ? 'Gönderiliyor…' : 'Gönder' }}
+      </button>
+    </div>
+  </div>
+</section>

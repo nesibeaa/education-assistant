@@ -1,0 +1,25 @@
+<section class="history wrap">
+  <div class="topbar">
+    <h2>Sohbetler</h2>
+    
+    
+  </div>
+
+  <div *ngIf="loading">Yükleniyor…</div>
+  <div *ngIf="error" class="err">{{ error }}</div>
+
+  <div *ngIf="!loading && !error && items.length === 0">Henüz sohbet yok.</div>
+
+  <div class="list" *ngIf="!loading && !error">
+    <div class="item" *ngFor="let it of items" (click)="open(it)" style="cursor:pointer">
+      <div class="left">
+        <div class="title">{{ it.title || 'Sohbet' }}</div>
+        <div class="snippet">{{ it.lastSnippet }}</div>
+      </div>
+      <div class="right">
+        <small>{{ it.updatedAt | date: 'short' }}</small>
+        <span class="count">{{ it.messageCount }}</span>
+      </div>
+    </div>
+  </div>
+</section>

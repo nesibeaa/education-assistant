@@ -1,0 +1,23 @@
+<div class="auth-page">
+  <div class="auth-card">
+    <h1>Giriş Yap</h1>
+
+    <div class="auth-field">
+      <label for="email">Email</label>
+      <input id="email" type="email" [(ngModel)]="email" placeholder="you@example.com" />
+    </div>
+
+    <div class="auth-field">
+      <label for="password">Şifre</label>
+      <input id="password" type="password" [(ngModel)]="password" placeholder="••••••••" />
+    </div>
+
+    <div class="auth-actions">
+      <button class="primary" (click)="onLogin()">Giriş yap</button>
+      
+    </div>
+
+    <div class="auth-note" *ngIf="loginText">{{ loginText }}</div>
+    <div class="auth-note" *ngIf="meText">{{ meText }}</div>
+  </div>
+</div>

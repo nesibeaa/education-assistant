@@ -1,0 +1,25 @@
+<header class="topbar" *ngIf="showTopbar">
+  <div class="brand">
+    <a routerLink="/">Öğrenme Koçu</a>
+  </div>
+
+  <nav class="nav">
+    <a routerLink="/history" routerLinkActive="active" *ngIf="isLoggedIn">Sohbetler</a>
+  </nav>
+
+  <div class="auth" *ngIf="isLoggedIn">
+    <button (click)="newConversation()" title="Yeni sohbet">
+      <span class="material-symbols-outlined">chat_add_on</span>
+    </button>
+    <button (click)="logout()" title="Çıkış">
+      <span class="material-symbols-outlined">logout</span>
+    </button>
+  </div>
+
+  <div class="auth" *ngIf="!isLoggedIn">
+    <a routerLink="/login">Giriş Yap</a>
+    <a routerLink="/register">Kayıt Ol</a>
+  </div>
+</header>
+
+<router-outlet></router-outlet>

@@ -31,6 +31,10 @@ buildNumber.properties
 *.out
 *.pid.lock
 
+# Application properties (keep local, don't commit to GitHub)
+application.properties
+application-docker.properties
+
 # Angular
 node_modules/
 dist/

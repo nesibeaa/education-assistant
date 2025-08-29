@@ -19,9 +19,9 @@ export class AppComponent {
     return !!localStorage.getItem('token');
   }
 
-  
-  get showTopbar(): boolean {
-    return true;
+  isAuthPage(): boolean {
+    const currentUrl = this.router.url;
+    return currentUrl === '/login' || currentUrl === '/register';
   }
 
   newConversation() {
@@ -32,6 +32,6 @@ export class AppComponent {
 
   logout() {
     localStorage.removeItem('token');
-    this.router.navigateByUrl('/home');
+    this.router.navigateByUrl('/');
   }
 }

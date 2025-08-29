@@ -1,89 +1,171 @@
-<section class="chat">
-  <h2>Öğrenme Koçu</h2>
+<section class="h-[calc(100vh-0px)] flex flex-col">
+  <!-- Header -->
+  <div class="flex items-center justify-between px-4 sm:px-6 lg:px-8 py-4 border-b border-neutral-200/70 dark:border-neutral-800">
+    <div class="flex items-center gap-3">
+      
+      <div>
+        <p class="text-sm font-medium">Öğrenme Koçu</p>
+        <p class="text-xs text-neutral-500">AI destekli öğrenme asistanı</p>
+      </div>
+    </div>
+    <div class="flex items-center gap-2">
+      
+      
+    </div>
+  </div>
 
-  <div class="history">
-    <div *ngFor="let r of history" class="row" [ngClass]="r.role">
-      <!-- Kullanıcı -->
+  <!-- Messages -->
+  <div class="flex-1 overflow-y-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6" #messagesContainer>
+    <div *ngFor="let r of history" class="message-row" [ngClass]="r.role">
+      <!-- Kullanıcı Mesajı -->
       <ng-container *ngIf="r.role === 'user'">
-        <div class="bubble user">
-          <div class="meta">Sen</div>
-          <div class="text">{{ r.text }}</div>
+        <div class="flex items-start gap-3 justify-end">
+          <div class="max-w-3xl">
+            <div class="rounded-lg bg-blue-600 text-white p-3 text-sm leading-6 shadow">
+              {{ r.text }}
+            </div>
+            <div class="text-[11px] mt-1 text-neutral-500 text-right">Sen · {{ r.at | date:'HH:mm' }}</div>
+          </div>
         </div>
       </ng-container>
 
-      <!-- Asistan -->
+      <!-- AI Asistan Mesajı -->
       <ng-container *ngIf="r.role === 'assistant'">
-        <div class="bubble bot">
-          <div class="meta">
-            Koç <span class="src">({{ r.data.source }})</span>
+        <div class="flex items-start gap-3">
+          <div class="h-9 w-9 rounded-full bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center ring-1 ring-neutral-200 dark:ring-neutral-700">
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+            </svg>
           </div>
-
-          <div class="kv" *ngIf="has(r.data.topic)">
-            <span class="k">Topic:</span>
-            <span class="v">{{ r.data.topic }}</span>
-          </div>
-
-          <div class="kv" *ngIf="has(r.data.reply)">
-            <span class="k">Response:</span>
-            <span class="v">{{ r.data.reply }}</span>
-          </div>
-
-          <div class="kv" *ngIf="has(r.data.status)">
-            <span class="k">Status:</span>
-            <span class="v">{{ r.data.status }}</span>
-          </div>
-
-          <div class="kv" *ngIf="has(r.data.difficulty)">
-            <span class="k">Difficulty:</span>
-            <span class="v">{{ r.data.difficulty }}</span>
-          </div>
-
-          <div class="kv" *ngIf="has(r.data.nextStep)">
-            <span class="k">Next Step:</span>
-            <span class="v">{{ r.data.nextStep }}</span>
-          </div>
-
-       
-
-          <!-- Kaynaklar -->
-          <div class="resources" *ngIf="r.data.resources?.length">
-            <div class="label">Resources:</div>
-            <ul>
-              <li *ngFor="let link of r.data.resources">
-                <a [href]="link.url" target="_blank" rel="noopener">
-                  {{ link.title }}
-                </a>
-              </li>
-            </ul>
+          <div class="max-w-3xl">
+            <div class="rounded-lg bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 p-3 text-sm leading-6">
+              {{ r.data.reply }}
+            </div>
+            
+            <!-- AI Metadata -->
+            <div *ngIf="r.data.topic || r.data.difficulty || r.data.status" class="mt-3">
+              <div class="rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white/70 dark:bg-neutral-900/60 backdrop-blur p-4 space-y-3">
+                <div class="flex items-center justify-between">
+                  <h4 class="text-sm font-semibold tracking-tight">Yanıt Özeti</h4>
+                  <span *ngIf="r.data.confidence" class="text-xs rounded-full px-2 py-0.5 bg-emerald-500/10 text-emerald-400 ring-1 ring-inset ring-emerald-500/20">
+                    Güven: {{ toPercent(r.data.confidence) }}
+                  </span>
+                </div>
+                
+                <!-- Üç kutu: Konu, Zorluk, Durum -->
+                <div class="grid sm:grid-cols-3 gap-3 text-sm">
+                  <div *ngIf="r.data.topic" class="rounded-lg border border-neutral-200 dark:border-neutral-800 p-3">
+                    <p class="text-[11px] uppercase tracking-wide text-neutral-500">Konu</p>
+                    <p class="mt-1 font-medium">{{ r.data.topic }}</p>
+                  </div>
+                  <div *ngIf="r.data.difficulty" class="rounded-lg border border-neutral-200 dark:border-neutral-800 p-3">
+                    <p class="text-[11px] uppercase tracking-wide text-neutral-500">Zorluk</p>
+                    <p class="mt-1 font-medium">{{ r.data.difficulty }}</p>
+                  </div>
+                  <div *ngIf="r.data.status" class="rounded-lg border border-neutral-200 dark:border-neutral-800 p-3">
+                    <p class="text-[11px] uppercase tracking-wide text-neutral-500">Durum</p>
+                    <p class="mt-1 font-medium text-emerald-500">{{ r.data.status }}</p>
+                  </div>
+                </div>
+                
+                <!-- Sonraki Adım - Ayrı satırda -->
+                <div *ngIf="r.data.nextStep" class="rounded-lg border border-neutral-200 dark:border-neutral-800 p-3">
+                  <p class="text-[11px] uppercase tracking-wide text-neutral-500">Sonraki Adım</p>
+                  <p class="mt-1 font-medium">{{ r.data.nextStep }}</p>
+                </div>
+                
+                <!-- Kaynaklar -->
+                <div *ngIf="r.data.resources?.length">
+                  <p class="text-xs text-neutral-500 mb-2">Kaynaklar</p>
+                  <div class="flex flex-wrap gap-2">
+                    <a *ngFor="let link of r.data.resources" 
+                       [href]="link.url" 
+                       target="_blank" 
+                       rel="noopener"
+                       class="inline-flex items-center gap-2 rounded-md border border-neutral-200 dark:border-neutral-800 px-3 py-1.5 text-xs hover:bg-neutral-100 dark:hover:bg-neutral-900">
+                      <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
+                      </svg> {{ link.title }}
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="text-[11px] mt-1 text-neutral-500">AI · {{ r.at | date:'HH:mm' }}</div>
           </div>
         </div>
       </ng-container>
 
-      <!-- Hata balonu -->
+      <!-- Hata Mesajı -->
       <ng-container *ngIf="r.role === 'error'">
-        <div class="bubble error">
-          <div class="meta">Koç (error)</div>
-          <div class="kv">
-            <span class="k">Response:</span>
-            <span class="v">Üzgünüm, bir hata oluştu.</span>
+        <div class="flex items-start gap-3">
+          <div class="h-9 w-9 rounded-full bg-red-100 dark:bg-red-900 flex items-center justify-center ring-1 ring-red-200 dark:ring-red-700">
+            <svg class="h-4 w-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+          </div>
+          <div class="max-w-3xl">
+            <div class="rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 p-3 text-sm leading-6 text-red-800 dark:text-red-200">
+              {{ r.message || 'Üzgünüm, bir hata oluştu. Lütfen tekrar deneyin.' }}
+            </div>
+            <div class="text-[11px] mt-1 text-neutral-500">Sistem · {{ r.at | date:'HH:mm' }}</div>
           </div>
         </div>
       </ng-container>
     </div>
+
+    <!-- Loading Indicator -->
+    <div *ngIf="loading" class="flex items-start gap-3">
+      <div class="h-9 w-9 rounded-full bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center ring-1 ring-neutral-200 dark:ring-neutral-700">
+        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+        </svg>
+      </div>
+      <div class="max-w-3xl">
+        <div class="rounded-lg bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 p-3 text-sm">
+          <span class="inline-flex items-center gap-1">
+            <span class="h-2 w-2 rounded-full bg-neutral-400 animate-pulse"></span>
+            <span class="h-2 w-2 rounded-full bg-neutral-400 animate-pulse [animation-delay:150ms]"></span>
+            <span class="h-2 w-2 rounded-full bg-neutral-400 animate-pulse [animation-delay:300ms]"></span>
+          </span>
+        </div>
+        <div class="text-[11px] mt-1 text-neutral-500">Yazıyor…</div>
+      </div>
+    </div>
   </div>
 
-  <div class="composer">
-    <textarea
-      rows="3"
-      placeholder="Sorunu yaz ve Enter'a bas (Shift+Enter: satır)"
-      [(ngModel)]="input"
-      (keydown)="keydown($event)"
-    ></textarea>
-
-    <div class="actions">
-      <button (click)="send()" [disabled]="loading || !input.trim()">
-        {{ loading ? 'Gönderiliyor…' : 'Gönder' }}
-      </button>
+  <!-- Input -->
+  <div class="px-4 sm:px-6 lg:px-8 py-4 border-t border-neutral-200/70 dark:border-neutral-800">
+    <div class="max-w-4xl mx-auto">
+      <div class="rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white/70 dark:bg-neutral-900/60 backdrop-blur p-3">
+        <div class="flex items-end gap-2">
+          
+          <textarea
+            #messageInput
+            rows="2"
+            placeholder="Sorunu yaz veya bir dosya ekle..."
+            [(ngModel)]="input"
+            (keydown)="keydown($event)"
+            class="flex-1 rounded-md border border-neutral-200 dark:border-neutral-800 bg-transparent px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-600/30 resize-none"
+          ></textarea>
+          <button 
+            (click)="send()" 
+            [disabled]="loading || !input.trim()"
+            class="inline-flex items-center gap-2 rounded-md bg-blue-600 text-white px-4 py-2 text-sm hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+            </svg> {{ loading ? 'Gönderiliyor...' : 'Gönder' }}
+          </button>
+        </div>
+        <div class="mt-2 flex items-center justify-between">
+          <p class="text-[11px] text-neutral-500">Gemini ile daha iyi yanıtlar için net örnekler ver.</p>
+          <div class="flex items-center gap-2">
+            
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </section>

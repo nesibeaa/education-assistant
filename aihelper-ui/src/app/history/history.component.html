@@ -1,25 +1,93 @@
-<section class="history wrap">
-  <div class="topbar">
-    <h2>Sohbetler</h2>
-    
-    
+<section class="p-4 sm:p-6 lg:p-8 space-y-6">
+  <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+    <h3 class="text-2xl font-semibold tracking-tight">Sohbet Geçmişi</h3>
+    <div class="flex items-center gap-2">
+      <div class="relative">
+        <svg class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+        </svg>
+        <input 
+          type="text" 
+          placeholder="Sohbetlerde ara..." 
+          class="w-64 rounded-md border border-neutral-200 dark:border-neutral-800 bg-transparent pl-9 pr-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-600/30"
+          (input)="onSearch($event)"
+          [value]="searchQuery"
+        >
+      </div>
+      
+    </div>
   </div>
 
-  <div *ngIf="loading">Yükleniyor…</div>
-  <div *ngIf="error" class="err">{{ error }}</div>
+  <!-- Loading State -->
+  <div *ngIf="loading" class="flex items-center justify-center py-12">
+    <div class="flex items-center gap-3">
+      <div class="h-6 w-6 rounded-full border-2 border-blue-600 border-t-transparent animate-spin"></div>
+      <p class="text-neutral-600 dark:text-neutral-400">Yükleniyor...</p>
+    </div>
+  </div>
 
-  <div *ngIf="!loading && !error && items.length === 0">Henüz sohbet yok.</div>
+  <!-- Error State -->
+  <div *ngIf="error" class="rounded-xl border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20 p-6 text-center">
+    <svg class="h-12 w-12 text-red-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+    </svg>
+    <p class="text-red-800 dark:text-red-200 mb-4">{{ error }}</p>
+    <button (click)="refresh()" class="rounded-md bg-red-600 text-white px-4 py-2 text-sm hover:bg-red-500">
+      Tekrar Dene
+    </button>
+  </div>
 
-  <div class="list" *ngIf="!loading && !error">
-    <div class="item" *ngFor="let it of items" (click)="open(it)" style="cursor:pointer">
-      <div class="left">
-        <div class="title">{{ it.title || 'Sohbet' }}</div>
-        <div class="snippet">{{ it.lastSnippet }}</div>
+  <!-- Empty State -->
+  <div *ngIf="!loading && !error && filteredItems.length === 0 && items.length === 0" class="rounded-xl border border-neutral-200 dark:border-neutral-800 p-12 text-center">
+    <svg class="h-16 w-16 text-neutral-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+    </svg>
+    <h3 class="text-lg font-semibold mb-2">Henüz sohbet yok</h3>
+    <p class="text-neutral-600 dark:text-neutral-400 mb-6">İlk öğrenme yolculuğuna başlamak için yeni bir sohbet oluştur</p>
+    <button (click)="newChat()" class="inline-flex items-center gap-2 rounded-md bg-blue-600 text-white px-4 py-2 text-sm hover:bg-blue-500">
+      <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+      </svg> Yeni Sohbet Başlat
+    </button>
+  </div>
+
+  <!-- Search No Results -->
+  <div *ngIf="!loading && !error && filteredItems.length === 0 && items.length > 0" class="rounded-xl border border-neutral-200 dark:border-neutral-800 p-12 text-center">
+    <svg class="h-16 w-16 text-neutral-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+    </svg>
+    <h3 class="text-lg font-semibold mb-2">Sonuç bulunamadı</h3>
+    <p class="text-neutral-600 dark:text-neutral-400 mb-6">"{{ searchQuery }}" için arama sonucu bulunamadı</p>
+    <button (click)="searchQuery = ''; filteredItems = items" class="rounded-md bg-blue-600 text-white px-4 py-2 text-sm hover:bg-blue-500">
+      Tümünü Göster
+    </button>
+  </div>
+
+  <!-- History List -->
+  <div *ngIf="!loading && !error && filteredItems.length > 0" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div 
+      *ngFor="let item of filteredItems" 
+      class="group rounded-xl border border-neutral-200 dark:border-neutral-800 p-5 hover:border-blue-600/60 hover:shadow-sm transition-all cursor-pointer"
+      (click)="open(item)"
+    >
+      <div class="flex items-center justify-between">
+        <p class="text-sm font-medium">{{ item.title || 'Sohbet' }}</p>
+        <span class="text-[11px] text-neutral-500">{{ formatTimeAgo(item.updatedAt) }}</span>
       </div>
-      <div class="right">
-        <small>{{ it.updatedAt | date: 'short' }}</small>
-        <span class="count">{{ it.messageCount }}</span>
+      <p class="text-sm text-neutral-600 dark:text-neutral-300 mt-2 line-clamp-2">{{ item.lastSnippet || 'Henüz mesaj yok' }}</p>
+      <div class="mt-4 flex items-center justify-between text-xs">
+        <span class="inline-flex items-center gap-1 text-neutral-500">
+          <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+          </svg> {{ item.messageCount }} mesaj
+        </span>
+        <span class="opacity-0 group-hover:opacity-100 transition-opacity text-blue-600">Devam et</span>
       </div>
     </div>
+  </div>
+
+  <!-- New Chat Button -->
+  <div *ngIf="!loading && !error" class="flex justify-center pt-6">
+    
   </div>
 </section>

@@ -1,36 +1,77 @@
 <div class="auth-page">
-  <div class="auth-card">
-    <h1>Kayıt Ol</h1>
+  <div class="auth-container">
+    <div class="auth-card">
+      <div class="auth-header">
+        <div class="auth-logo">
+          <div class="logo-icon">
+            <span class="logo-text">ÖK</span>
+          </div>
+          <span class="logo-title">Öğrenme Koçu</span>
+        </div>
+      </div>
 
-    <div class="auth-field">
-      <label for="reg-email">E‑posta</label>
-      <input
-        id="reg-email"
-        type="email"
-        name="email"
-        [(ngModel)]="email"
-        placeholder="you@example.com"
-        required
-      />
+      <div class="flex text-sm border border-neutral-200 dark:border-neutral-800 rounded-lg overflow-hidden mb-6">
+        <button class="flex-1 py-2 bg-blue-600/10 text-blue-700 dark:text-blue-400 font-medium">Kayıt Ol</button>
+      </div>
+
+      <!-- Register Form -->
+      <form class="auth-form" (ngSubmit)="onSubmit()">
+        <div class="form-field">
+          <label class="field-label" for="reg-email">E-posta</label>
+          <div class="input-container">
+            <i class="icon-mail"></i>
+            <input
+              id="reg-email"
+              type="email"
+              name="email"
+              [(ngModel)]="email"
+              placeholder="ornek@posta.com"
+              required
+              class="form-input"
+            />
+          </div>
+        </div>
+
+        <div class="form-field">
+          <label class="field-label" for="reg-password">Şifre</label>
+          <div class="input-container">
+            <i class="icon-lock"></i>
+            <input
+              id="reg-password"
+              type="password"
+              name="password"
+              [(ngModel)]="password"
+              placeholder="••••••••"
+              required
+              minlength="6"
+              class="form-input"
+            />
+          </div>
+          <div class="password-hint">
+            <span class="hint-text">En az 6 karakter</span>
+          </div>
+        </div>
+
+        <div class="form-options">
+          <div class="checkbox-group">
+            <button type="button" class="toggle-switch" [class.active]="acceptTerms" (click)="toggleAcceptTerms()" role="switch" [attr.aria-checked]="acceptTerms">
+              <span class="toggle-thumb"></span>
+            </button>
+            <span class="checkbox-label">
+              <a href="#" class="terms-link">Şartları</a> ve <a href="#" class="terms-link">Gizlilik Politikasını</a> kabul ediyorum
+            </span>
+          </div>
+        </div>
+
+        <button type="submit" class="submit-btn">
+          Kayıt Ol
+        </button>
+      </form>
     </div>
+  </div>
 
-    <div class="auth-field">
-      <label for="reg-password">Şifre</label>
-      <input
-        id="reg-password"
-        type="password"
-        name="password"
-        [(ngModel)]="password"
-        placeholder="••••••••"
-        required
-      />
-    </div>
-
-    <div class="auth-actions">
-      <button class="primary" (click)="onSubmit()">Kayıt ol</button>
-      
-    </div>
-
-    <div class="auth-note" *ngIf="note">{{ note }}</div>
+  <!-- Status Messages -->
+  <div class="status-message" *ngIf="note" [ngClass]="{'error': note.includes('hata'), 'success': note.includes('başarı')}">
+    {{ note }}
   </div>
 </div>
